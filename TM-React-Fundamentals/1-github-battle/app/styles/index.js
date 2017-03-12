@@ -1,7 +1,10 @@
 var styles = {
     transparentBg: {
-        background: 'lightblue',
+        background: 'steel',
         marginTop: 30
+    },
+    space: {
+        marginTop: '25px'
     }
 };
 
