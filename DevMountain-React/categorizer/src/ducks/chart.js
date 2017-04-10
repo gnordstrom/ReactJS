@@ -1,3 +1,7 @@
+const ADD_DATASET = "ADD_DATASET";
+const CREATE_CHART = "CREATE_CHART";
+const SET_ACTIVE_CHART_INDEX = "SET_ACTIVE_CHART_INDEX";
+
 const initialState = {
     activeChartIndex: 0,
     charts: [ {
@@ -22,9 +26,64 @@ const initialState = {
         } ]
 };
 
-export default function chart (state = initialState, action) {
+
+export default function chart(state = initialState, action) {
     switch (action.type) {
+        // Notice the brackets. This prevents variables from leeching into a different scope.
+        case ADD_DATASET: {
+            // Saving myself some typing and cleaning up code by destructuring often used values.
+            const { activeChartIndex, charts } = state;
+            const activeChart = charts[ activeChartIndex ];
+            return {
+                activeChartIndex
+                , charts: [
+                    // Making a copy of all the charts before the active chart
+                    ...charts.slice( 0, activeChartIndex )
+                    , Object.assign(
+                        {}
+                        , activeChart
+                        , { datasets: [ ...activeChart.datasets, action.dataset ] }
+                    )
+                    // Making a copy of all the charts after the active chart
+                    , ...charts.slice( activeChartIndex + 1, charts.length )
+                ]
+            }
+        }
+
+        case CREATE_CHART: 
+            return {
+                activeChartIndex: 0,
+                charts: [ action.chart, ...state.charts ]
+            }
+        
+        case SET_ACTIVE_CHART_INDEX:
+            return Object.assign( {}, state, { 
+                activeChartIndex: action.index,
+                charts: state.charts 
+            } );
+
         default: return state;
     }
     // return state;
+}
+
+export function addDataset(dataset) {
+    return {
+        type: ADD_DATASET,
+        dataset
+    }
+}
+
+export function createChart( labels, name ) {
+    return {
+        type: CREATE_CHART,
+        chart: { labels, name, datasets: [] }
+    }
+}
+
+export function setActiveChartIndex( index ) {
+    return {
+        type: SET_ACTIVE_CHART_INDEX,
+        index
+    }
 }
